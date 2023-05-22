@@ -7,6 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 import OnboardingScreen from './screens/OnboardingScreen';
+import SplashScreen from './screens/SplashScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import HomeScreen from './screens/HomeScreen';
 
@@ -34,17 +35,22 @@ export default function App() {
   return (
     <NavigationContainer>
       {/* <View style={styles.container}> */}
-      <Stack.Navigator>
-          {!isOnboardingCompleted ? (
-            <Stack.Screen name="Onboarding" component={OnboardingScreen} />
-          ) : (
-            <>
-              <Stack.Screen name="Home" component={HomeScreen} />
-              <Stack.Screen name="Profile" component={ProfileScreen} />
-            </>
-          )}
-        </Stack.Navigator>
-        <StatusBar style="auto" />
+      <Stack.Navigator initialRouteName="Splash">
+      <Stack.Screen
+          name="Splash"
+          component={SplashScreen}
+          options={{ headerShown: false }}
+        />
+        {!isOnboardingCompleted ? (
+          <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+        ) : (
+          <>
+            <Stack.Screen name="Profile" component={ProfileScreen} />
+            <Stack.Screen name="Home" component={HomeScreen} />
+          </>
+        )}
+      </Stack.Navigator>
+      <StatusBar style="auto" />
       {/* </View> */}
     </NavigationContainer>
   );
