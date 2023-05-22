@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, Button, Image } from 'react-native';
-import  AsyncStorage  from "react-native";
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const logo = require('../img/Logo.png');
 
 export default function OnboardingScreen() {
     const [firstName, setFirstName] = useState('');
     const [email, setEmail] = useState('');
+    const [isOnboardingCompleted, setIsOnboardingCompleted] = useState(false);
 
     const handleFirstNameChange = (text) => {
         setFirstName(text.replace(/[^a-zA-Z]/g, ''));
@@ -27,7 +27,7 @@ export default function OnboardingScreen() {
                   await AsyncStorage.setItem('onboardingStatus', 'completed');
             alert('Onboarding completed!');
           } catch (error) {
-            alert('Error saving onboarding status:', error);
+            console.log('Error saving onboarding status:', error.message);
           }
         }
       };
