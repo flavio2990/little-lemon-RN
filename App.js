@@ -13,7 +13,6 @@ import HomeScreen from './screens/HomeScreen';
 
 const Stack = createNativeStackNavigator();
 
-
 export default function App() {
   const [isOnboardingCompleted, setIsOnboardingCompleted] = useState(false);
 
@@ -34,30 +33,17 @@ export default function App() {
 
   return (
     <NavigationContainer>
-      {/* <View style={styles.container}> */}
-      <Stack.Navigator initialRouteName="Splash">
-      <Stack.Screen
+      <Stack.Navigator>
+        <Stack.Screen
           name="Splash"
           component={SplashScreen}
           options={{ headerShown: false }}
         />
-        {!isOnboardingCompleted ? (
-          <Stack.Screen name="Onboarding" component={OnboardingScreen} />
-        ) : (
-          <>
-            <Stack.Screen name="Profile" component={ProfileScreen} />
-            <Stack.Screen name="Home" component={HomeScreen} />
-          </>
-        )}
+        <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+        <Stack.Screen name="Profile" component={ProfileScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Home" component={HomeScreen} />
       </Stack.Navigator>
       <StatusBar style="auto" />
-      {/* </View> */}
     </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});

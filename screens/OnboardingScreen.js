@@ -1,13 +1,18 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, Button, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
 
 const logo = require('../img/Logo.png');
 
+
 export default function OnboardingScreen() {
+
     const [firstName, setFirstName] = useState('');
     const [email, setEmail] = useState('');
     const [isOnboardingCompleted, setIsOnboardingCompleted] = useState(false);
+    const navigation = useNavigation();
+
 
     const handleFirstNameChange = (text) => {
         setFirstName(text.replace(/[^a-zA-Z]/g, ''));
@@ -19,26 +24,31 @@ export default function OnboardingScreen() {
 
     const handleOnboardingComplete = async () => {
         if (firstName.trim() === '') {
-          alert('Please enter your first name.');
+            alert('Please enter your first name.');
         } else if (!validateEmail(email)) {
-          alert('Please enter a valid email address.');
+            alert('Please enter a valid email address.');
         } else {
-          try { setIsOnboardingCompleted(true);
-                  await AsyncStorage.setItem('onboardingStatus', 'completed');
-            alert('Onboarding completed!');
-          } catch (error) {
-            console.log('Error saving onboarding status:', error.message);
-          }
+            try {
+                setIsOnboardingCompleted(true);
+                await AsyncStorage.setItem('@firstName',firstName)
+                await AsyncStorage.setItem('@email',email)
+                await AsyncStorage.setItem('onboardingStatus', 'completed');
+                alert('Onboarding completed!');
+                navigation.navigate('Profile') ;
+            } catch (error) {
+                console.log('Error saving onboarding status:', error.message);
+            }
         }
-      };
-      
+    };
+
 
     const validateEmail = (email) => {
-        // Email validation regular expression
         const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
         return emailRegex.test(email);
     };
     const isNextButtonDisabled = firstName.trim() === '' || !validateEmail(email);
+
+
     return (
         <View style={styles.container}>
             <View style={styles.headerContainer}>
