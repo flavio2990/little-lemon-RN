@@ -1,59 +1,105 @@
-// import React from 'react';
-// import { StyleSheet, Text, View, TextInput } from 'react-native';
-
-// export default function ProfileScreen({ route }) {
-//     const { firstName, email } = route
-  
-//     return (
-//         <View style={styles.container}>
-//             <Text>Profile Screen</Text>
-//             <TextInput style={styles.input}
-//             placeholder={firstName}> {firstName}</TextInput>
-//             <TextInput style={styles.input}>{email}</TextInput>
-//         </View>
-//     );
-// }
-
-// const styles = StyleSheet.create({
-//     container: {
-//         flex: 1,
-//         alignItems: 'center',
-//         justifyContent: 'center',
-//     },
-//     input: {
-//         height: 40,
-//         width: 200,
-//         borderColor: 'gray',
-//         borderWidth: 1,
-//         marginBottom: 10,
-//         paddingHorizontal: 10,
-//     },
-// });
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TextInput } from 'react-native';
+import { StyleSheet, Text, View, TextInput, Image, Button } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { TextInputMask } from 'react-native-masked-text';
+import * as ImagePicker from 'expo-image-picker';
+import { Avatar, CheckBox } from 'react-native-elements';
+import { useNavigation } from '@react-navigation/native';
 
-export default function ProfileScreen() {
+
+const logo = require('../img/Logo.png');
+
+export default function ProfileScreen( ) {
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   const [firstName, setFirstName] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
+  const [profileImage, setProfileImage] = useState(null);
+  const [isEmailNotificationEnabled, setIsEmailNotificationEnabled] = useState(false);
+  const [isNotification1Enabled, setIsNotification1Enabled] = useState(false);
+  const [isNotification2Enabled, setIsNotification2Enabled] = useState(false);
 
+const navigation = useNavigation();
+
+  const checkData = async () => {
+    try {
+      setIsDataLoaded(false);
+      const onboardingStatus = await AsyncStorage.getItem('onboardingStatus');
+      const storedFirstName = await AsyncStorage.getItem('@firstName');
+      const storedEmail = await AsyncStorage.getItem('@email');
+      const storedLastName = await AsyncStorage.getItem('@lastName');
+      const storedPhoneNumber = await AsyncStorage.getItem('@phoneNumber');
+      const storedProfileImage = await AsyncStorage.getItem('@profileImage');
+      const storedIsEmailNotificationEnabled = await AsyncStorage.getItem('@isEmailNotificationEnabled');
+      const storedIsNotification1Enabled = await AsyncStorage.getItem('@isNotification1Enabled');
+      const storedIsNotification2Enabled = await AsyncStorage.getItem('@isNotification2Enabled');
+
+      setFirstName(storedFirstName || '');
+      setLastName(storedLastName || '');
+      setEmail(storedEmail || '');
+      setPhoneNumber(storedPhoneNumber || '');
+      setProfileImage(storedProfileImage || null);
+      setIsEmailNotificationEnabled(storedIsEmailNotificationEnabled === 'true');
+      setIsNotification1Enabled(storedIsNotification1Enabled === 'true');
+      setIsNotification2Enabled(storedIsNotification2Enabled === 'true');
+      setIsDataLoaded(onboardingStatus === 'completed');
+    } catch (error) {
+      console.log('Error checking data:', error.message);
+    }
+  };
+  
   useEffect(() => {
     checkData();
   }, []);
 
-  const checkData = async () => {
+  const saveChanges = async () => {
     try {
-      const onboardingStatus = await AsyncStorage.getItem('onboardingStatus');
-      const firstName=await AsyncStorage.getItem('@firstName');
-      setFirstName(firstName)
-      const email= await AsyncStorage.getItem('@email');
-      setEmail(email)
-      setIsDataLoaded(onboardingStatus === 'completed');
+      await AsyncStorage.setItem('@firstName', firstName);
+      await AsyncStorage.setItem('@lastName', lastName);
+      await AsyncStorage.setItem('@email', email);
+      await AsyncStorage.setItem('@phoneNumber', phoneNumber);
+      if (profileImage) {
+        await AsyncStorage.setItem('@profileImage', profileImage);
+      } else {
+        await AsyncStorage.removeItem('@profileImage');
+      }
+      await AsyncStorage.setItem('@isEmailNotificationEnabled', String(isEmailNotificationEnabled));
+      await AsyncStorage.setItem('@isNotification1Enabled', String(isNotification1Enabled));
+      await AsyncStorage.setItem('@isNotification2Enabled', String(isNotification2Enabled));
+
+      alert('Changes saved successfully!');
     } catch (error) {
-      console.log('Error checking onboarding status:', error.message);
+      console.log('Error saving changes:', error.message);
     }
   };
+
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.clear();
+      navigation.navigate('Onboarding');
+    } catch (error) {
+      console.log('Error logging out:', error.message);
+    }
+  };
+
+  const pickImage = async () => {
+    try {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        console.log('Permission to access gallery denied');
+        return;
+      }
+      const result = await ImagePicker.launchImageLibraryAsync();
+      if (!result.canceled) {
+        const selectedImage = result.assets[0];
+        setProfileImage(selectedImage.uri);
+      }
+    } catch (error) {
+      console.log('Error picking image:', error);
+    }
+  };
+
   if (!isDataLoaded) {
     return (
       <View style={styles.container}>
@@ -63,9 +109,73 @@ export default function ProfileScreen() {
   }
   return (
     <View style={styles.container}>
-      <Text>Profile Screen</Text>     
-      <TextInput style={styles.input} value={firstName} />
-      <TextInput style={styles.input} value={email} />
+      <View style={styles.header}>
+        <Button title="Back" onPress={() => navigation.navigate('Onboarding')}/>
+        <Image source={logo} style={styles.logo} />
+        <Avatar
+          containerStyle={styles.avatarContainer}
+          avatarStyle={styles.avatar}
+          size="medium"
+          rounded
+          title={`${firstName.charAt(0)}${firstName.charAt(1)}`}
+          source={profileImage ? { uri: profileImage } : null}
+          onPress={pickImage}
+        />
+      </View>
+      <View style={styles.personalInfoContainer}>
+        <Text>Personal Information</Text>
+      </View>
+      <View style={styles.personalInfoText}>
+        <Avatar
+          containerStyle={styles.avatarContainer}
+          avatarStyle={styles.avatar}
+          size="xlarge"
+          rounded
+          title={`${firstName.charAt(0)}${firstName.charAt(1)}`}
+          source={profileImage ? { uri: profileImage } : null}
+          onPress={pickImage}
+        />
+      </View>
+      <TextInput style={styles.input} value={firstName} onChangeText={setFirstName} />
+      <TextInput style={styles.input} value={email} onChangeText={setEmail} />
+      <TextInput style={styles.input} value={lastName} onChangeText={setLastName}  placeholder="Last Name" />
+      <TextInputMask
+        style={styles.input}
+        type={'custom'}
+        options={{
+          mask: '(999) 999-9999',
+        }}
+        value={phoneNumber}
+        onChangeText={setPhoneNumber}
+        placeholder="Phone Number"
+        keyboardType="phone-pad"
+      />
+      <View style={styles.checkboxContainer}>
+        <CheckBox
+          title="Enable Email Notifications"
+          checked={isEmailNotificationEnabled}
+          onPress={() => setIsEmailNotificationEnabled(!isEmailNotificationEnabled)}
+          containerStyle={styles.checkbox}
+        />
+        <View style={styles.checkboxContainer}>
+          <CheckBox
+            title="Order Statuses"
+            checked={isNotification1Enabled}
+            onPress={() => setIsNotification1Enabled(!isNotification1Enabled)}
+            containerStyle={styles.checkbox}
+          />
+        </View>
+        <View style={styles.checkboxContainer}>
+          <CheckBox
+            title="Special Offers"
+            checked={isNotification2Enabled}
+            onPress={() => setIsNotification2Enabled(!isNotification1Enabled)}
+            containerStyle={styles.checkbox}
+          />
+        </View>
+      </View>
+      <Button   buttonStyle={styles.logoutButton} title="Logout" onPress={handleLogout} />
+      <Button title="Save Changes" onPress={saveChanges} />
     </View>
   );
 }
@@ -74,14 +184,58 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
+    paddingTop: 32,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    marginBottom: 30,
   },
   input: {
     height: 40,
-    width: 200,
+    width: 300,
     borderColor: 'gray',
     borderWidth: 1,
     marginBottom: 10,
     paddingHorizontal: 10,
+    borderRadius: 10,
+  },
+  personalInfoContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 30,
+  },
+  personalInfoText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 30,
+  },
+  avatarContainer: {
+    backgroundColor: 'lightblue',
+    borderRadius: 100,
+    overflow: 'hidden',
+    marginRight: 16,
+  },
+  logo: {
+    resizeMode: 'contain',
+  },
+  avatar: {
+    resizeMode: 'contain',
+  },
+  checkboxContainer: {
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    marginLeft: 0,
+  },
+  checkbox: {
+    backgroundColor: 'transparent',
+    borderWidth: 0,
+    paddingHorizontal: 0,
+    marginLeft: 0,
   },
 });

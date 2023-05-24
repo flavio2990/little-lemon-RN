@@ -4,8 +4,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 
 const logo = require('../img/Logo.png');
-
-
 export default function OnboardingScreen() {
 
     const [firstName, setFirstName] = useState('');
@@ -21,7 +19,6 @@ export default function OnboardingScreen() {
     const handleEmailChange = (text) => {
         setEmail(text);
     };
-
     const handleOnboardingComplete = async () => {
         if (firstName.trim() === '') {
             alert('Please enter your first name.');
@@ -30,25 +27,22 @@ export default function OnboardingScreen() {
         } else {
             try {
                 setIsOnboardingCompleted(true);
-                await AsyncStorage.setItem('@firstName',firstName)
-                await AsyncStorage.setItem('@email',email)
+                await AsyncStorage.multiRemove(['@firstName', '@email']);
+                await AsyncStorage.setItem('@firstName', firstName);
+                await AsyncStorage.setItem('@email', email);
                 await AsyncStorage.setItem('onboardingStatus', 'completed');
                 alert('Onboarding completed!');
-                navigation.navigate('Profile') ;
+                navigation.navigate('Profile');
             } catch (error) {
-                console.log('Error saving onboarding status:', error.message);
+                console.log('Error saving onboarding data:', error.message);
             }
         }
     };
-
-
     const validateEmail = (email) => {
         const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
         return emailRegex.test(email);
     };
     const isNextButtonDisabled = firstName.trim() === '' || !validateEmail(email);
-
-
     return (
         <View style={styles.container}>
             <View style={styles.headerContainer}>
@@ -102,9 +96,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         flex: 1,
     },
-    // logoContainer: {
-    //     backgroundColor: 'green',
-    // },
     logo: {
         resizeMode: 'contain',
     },
