@@ -21,24 +21,30 @@ export default function OnboardingScreen() {
     };
     const handleOnboardingComplete = async () => {
         if (firstName.trim() === '') {
-            alert('Please enter your first name.');
+          alert('Please enter your first name.');
         } else if (!validateEmail(email)) {
-            alert('Please enter a valid email address.');
+          alert('Please enter a valid email address.');
         } else {
-            try {
-                setIsOnboardingCompleted(true);
-                await AsyncStorage.multiRemove(['@firstName', '@email']);
-                await AsyncStorage.setItem('@firstName', firstName);
-                await AsyncStorage.setItem('@email', email);
-                await AsyncStorage.setItem('onboardingStatus', 'completed');
-                alert('Onboarding completed!');
-                navigation.navigate('Profile');
-            } catch (error) {
-                console.log('Error saving onboarding data:', error.message);
-            }
+          try {
+            setIsOnboardingCompleted(true);
+      
+            const data = {
+              firstName: firstName,
+              email: email,
+            };
+      
+            const serializedData = JSON.stringify(data);
+      
+            await AsyncStorage.setItem('@data', serializedData);
+            await AsyncStorage.setItem('onboardingStatus', 'completed');
+            alert('Onboarding completed!');
+            navigation.navigate('Profile');
+          } catch (error) {
+            console.log('Error saving onboarding data:', error.message);
+          }
         }
-    };
-    const validateEmail = (email) => {
+      };
+          const validateEmail = (email) => {
         const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
         return emailRegex.test(email);
     };
@@ -47,7 +53,6 @@ export default function OnboardingScreen() {
         <View style={styles.container}>
             <View style={styles.headerContainer}>
                 <Text style={styles.headerText}>Little Lemon</Text>
-                {/* <View style={styles.logoContainer}> */}
                 <View>
                     <Image source={logo} style={styles.logo} />
                 </View>
