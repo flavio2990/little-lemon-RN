@@ -5,7 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import { Avatar } from 'react-native-elements';
 import { useRoute } from '@react-navigation/native';
 import { createTable, getMenuItems, saveMenuItems, filterByQueryAndCategories, } from '../data/database';
-import CategoryList from '../components/CategoryList';
+import CategoryList from '../categories/CategoryList';
 
 const logo = require('../img/Logo.png');
 
