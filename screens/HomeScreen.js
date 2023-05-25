@@ -4,6 +4,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { Avatar } from 'react-native-elements';
 import { useRoute } from '@react-navigation/native';
+import {
+    createTable,
+    getMenuItems,
+    saveMenuItems,
+    filterByQueryAndCategories,
+  } from '../database'
 
 const logo = require('../img/Logo.png');
 
@@ -19,19 +25,53 @@ export default function HomeScreen() {
     `https://github.com/Meta-Mobile-Developer-PC/Working-With-Data-API/blob/main/images/${imageFileName}?raw=true`;
 
 
-    useEffect(() => {
-        fetchMenuData(); // Call fetchMenuData function on component mount
-    }, []);
+    
 
+    // const fetchMenuData = async () => {
+    //     try {
+    //         const response = await fetch('https://raw.githubusercontent.com/Meta-Mobile-Developer-PC/Working-With-Data-API/main/capstone.json'); // Replace 'URL_OF_REMOTE_SERVER' with the actual URL
+    //         const data = await response.json();
+    //         setMenuData(data.menu);
+    //     } catch (error) {
+    //         console.error('Error fetching menu data:', error);
+    //     }
+    // };
+    // useEffect(() => {
+    //     fetchMenuData(); 
+    // }, []);
+    //////
     const fetchMenuData = async () => {
         try {
-            const response = await fetch('https://raw.githubusercontent.com/Meta-Mobile-Developer-PC/Working-With-Data-API/main/capstone.json'); // Replace 'URL_OF_REMOTE_SERVER' with the actual URL
+          const menuItems = await getMenuItems();
+          if (menuItems.length > 0) {
+            setMenuData(menuItems);
+          } else {
+            const response = await fetch('https://raw.githubusercontent.com/Meta-Mobile-Developer-PC/Working-With-Data-API/main/capstone.json');
             const data = await response.json();
+            saveMenuItems(data.menu);
             setMenuData(data.menu);
+          }
         } catch (error) {
-            console.error('Error fetching menu data:', error);
+          console.error('Error fetching menu data:', error);
         }
-    };
+      };
+
+      useEffect(() => {
+        (async () => {
+          try {
+            await createTable();
+            await fetchMenuData();
+            const sectionListData = getSectionListData(menuData);
+            setData(sectionListData);
+            const getProfile = await AsyncStorage.getItem('profile');
+            setProfile(JSON.parse(getProfile));
+          } catch (e) {
+            Alert.alert(e.message);
+          }
+        })();
+      }, []);
+    
+    
 
     const renderMenuItem = ({ item }) => (
         <View style={styles.menuItemContainer}>
