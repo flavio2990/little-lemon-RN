@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, Button, Image, Dimensions } from 'react-native';
+import { StyleSheet, Text, View, Button, Image, Dimensions,FlatList } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { Avatar } from 'react-native-elements';
@@ -14,6 +14,38 @@ export default function HomeScreen() {
     const navigation = useNavigation();
     const route = useRoute();
     const profileImage = route.params?.profileImage;
+    const [menuData, setMenuData] = useState(null);
+    const getImageUrl = (imageFileName) =>
+    `https://github.com/Meta-Mobile-Developer-PC/Working-With-Data-API/blob/main/images/${imageFileName}?raw=true`;
+
+
+    useEffect(() => {
+        fetchMenuData(); // Call fetchMenuData function on component mount
+    }, []);
+
+    const fetchMenuData = async () => {
+        try {
+            const response = await fetch('https://raw.githubusercontent.com/Meta-Mobile-Developer-PC/Working-With-Data-API/main/capstone.json'); // Replace 'URL_OF_REMOTE_SERVER' with the actual URL
+            const data = await response.json();
+            setMenuData(data.menu);
+        } catch (error) {
+            console.error('Error fetching menu data:', error);
+        }
+    };
+
+    const renderMenuItem = ({ item }) => (
+        <View style={styles.menuItemContainer}>
+          <Image source={{ uri: getImageUrl(item.image) }} style={styles.menuItemImage} />
+          <View style={styles.menuItemTextContainer}>
+            <Text style={styles.menuItemName}>{item.name}</Text>
+            <Text style={styles.menuItemPrice}>${item.price}</Text>
+            <Text style={styles.menuItemDescription}>{item.description}</Text>
+          </View>
+        </View>
+      );
+      const keyExtractor = (item) => item.name;
+
+
 
     return (
         <View style={styles.container}>
@@ -22,14 +54,22 @@ export default function HomeScreen() {
                 <Avatar containerStyle={styles.avatarContainer} avatarStyle={styles.avatar} size="medium" rounded source={profileImage ? { uri: profileImage } : null} />
             </View>
             <View style={styles.contentContainer}>
-                <Image source={require('../img/waiter.png')} style={styles.image} />
+                <Image source={require('../img/waiter.png')} style={styles.waiter} />
                 <View style={styles.textContainer}>
-                <Text style={styles.text}>Little Lemon</Text>
-                <Text style={styles.text}>Chicago</Text>
-                <Text style={styles.text}>We are a family owned mediterranean food</Text>
+                    <Text style={[styles.text, styles.title]}>Little Lemon</Text>
+                    <Text style={[styles.text, styles.city]}>Chicago</Text>
+                    <Text style={[styles.text, styles.description]}>We are a family owned {'\n'} mediterranean restaurant{'\n'} focused on traditional{'\n'}recipes served with a {'\n'} modern twist</Text>
+                    <Button title="Back" onPress={() => navigation.navigate('Profile')} />
                 </View>
             </View>
-            <Button title="Back" onPress={() => navigation.navigate('Profile')} />
+            {menuData && (
+        <FlatList
+          data={menuData}
+          renderItem={renderMenuItem}
+          keyExtractor={keyExtractor}
+          style={styles.menuList}
+        />
+      )}
         </View>
     );
 }
@@ -45,10 +85,11 @@ const styles = StyleSheet.create({
         resizeMode: 'contain',
     },
     waiter: {
+        width: 200,
+        height: 200,
         resizeMode: 'contain',
-        height: '20%',
-        width: '30%',
         borderRadius: 10,
+        marginBottom: 20,
     },
     avatarContainer: {
         backgroundColor: 'lightblue',
@@ -69,21 +110,66 @@ const styles = StyleSheet.create({
         marginBottom: 30,
     },
     contentContainer: {
+        backgroundColor: '#495E57',
         flexDirection: 'row-reverse',
         alignItems: 'center',
         justifyContent: 'space-evenly',
         width: '100%',
         paddingHorizontal: 16,
         paddingTop: 16,
-        marginBottom: 30,
+        marginBottom: 0,
     },
-    textContainer:{
+    textContainer: {
         flexDirection: 'column',
+        marginBottom: 60,
     },
-    image: {
-        width: 200,
-        height: 200,
-        resizeMode: 'contain',
-        borderRadius: 10,
+    text: {
+        marginBottom: 0,
     },
+    title: {
+        fontSize: 35,
+        color: '#F4CE14',
+    },
+    city: {
+        fontSize: 25,
+        marginBottom: 18,
+        color: '#EDEFEE'
+    },
+    description: {
+        fontSize: 20,
+        marginBottom: 0,
+        color: '#EDEFEE'
+    },
+    ///////////
+    menuList: {
+        width: '100%',
+        paddingHorizontal: 16,
+        marginTop: 20,
+      },
+      menuItemContainer: {
+        flexDirection: 'row',
+        marginBottom: 20,
+        alignItems: 'center',
+      },
+      menuItemImage: {
+        width: 80,
+        height: 80,
+        marginRight: 10,
+        borderRadius: 5,
+      },
+      menuItemTextContainer: {
+        flex: 1,
+      },
+      menuItemName: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 5,
+      },
+      menuItemPrice: {
+        fontSize: 16,
+        marginBottom: 5,
+      },
+      menuItemDescription: {
+        fontSize: 14,
+      },
 })
