@@ -9,7 +9,7 @@ import { useNavigation } from '@react-navigation/native';
 
 const logo = require('../img/Logo.png');
 
-export default function ProfileScreen( ) {
+export default function ProfileScreen() {
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   const [firstName, setFirstName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -20,39 +20,48 @@ export default function ProfileScreen( ) {
   const [isNotification1Enabled, setIsNotification1Enabled] = useState(false);
   const [isNotification2Enabled, setIsNotification2Enabled] = useState(false);
 
-const navigation = useNavigation();
+  const navigation = useNavigation();
 
   const checkData = async () => {
     try {
       setIsDataLoaded(false);
       const onboardingStatus = await AsyncStorage.getItem('onboardingStatus');
-      const storedFirstName = await AsyncStorage.getItem('@firstName');
-      const storedEmail = await AsyncStorage.getItem('@email');
-      const storedLastName = await AsyncStorage.getItem('@lastName');
-      const storedPhoneNumber = await AsyncStorage.getItem('@phoneNumber');
-      const storedProfileImage = await AsyncStorage.getItem('@profileImage');
-      const storedIsEmailNotificationEnabled = await AsyncStorage.getItem('@isEmailNotificationEnabled');
-      const storedIsNotification1Enabled = await AsyncStorage.getItem('@isNotification1Enabled');
-      const storedIsNotification2Enabled = await AsyncStorage.getItem('@isNotification2Enabled');
+      const storedData = await AsyncStorage.getItem('@data');
 
-      setFirstName(storedFirstName || '');
-      setLastName(storedLastName || '');
-      setEmail(storedEmail || '');
-      setPhoneNumber(storedPhoneNumber || '');
-      setProfileImage(storedProfileImage || null);
-      setIsEmailNotificationEnabled(storedIsEmailNotificationEnabled === 'true');
-      setIsNotification1Enabled(storedIsNotification1Enabled === 'true');
-      setIsNotification2Enabled(storedIsNotification2Enabled === 'true');
+      if (storedData) {
+        const {
+          firstName,
+          email,
+          phoneNumber,
+          lastName,
+          profileImage,
+          isEmailNotificationEnabled,
+          isNotification1Enabled,
+          isNotification2Enabled,
+        } = JSON.parse(storedData);
+
+        setFirstName(firstName || '');
+        setEmail(email || '');
+        setPhoneNumber(phoneNumber || '');
+        setLastName(lastName || '');
+        setProfileImage(profileImage || null);
+        setIsEmailNotificationEnabled(isEmailNotificationEnabled || false);
+        setIsNotification1Enabled(isNotification1Enabled || false);
+        setIsNotification2Enabled(isNotification2Enabled || false);
+      }
+
       setIsDataLoaded(onboardingStatus === 'completed');
     } catch (error) {
       console.log('Error checking data:', error.message);
     }
   };
-  
-  useEffect(() => {
-    checkData();
-  }, []);
 
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      checkData();
+    });
+    return unsubscribe;
+  }, [navigation]);
   const saveChanges = async () => {
     try {
       await AsyncStorage.setItem('@firstName', firstName);
@@ -67,6 +76,7 @@ const navigation = useNavigation();
       await AsyncStorage.setItem('@isEmailNotificationEnabled', String(isEmailNotificationEnabled));
       await AsyncStorage.setItem('@isNotification1Enabled', String(isNotification1Enabled));
       await AsyncStorage.setItem('@isNotification2Enabled', String(isNotification2Enabled));
+      navigation.navigate('Home', { profileImage: profileImage, firstName: firstName, });
 
       alert('Changes saved successfully!');
     } catch (error) {
@@ -110,7 +120,7 @@ const navigation = useNavigation();
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Button title="Back" onPress={() => navigation.navigate('Onboarding')}/>
+        <Button title="Back" onPress={() => navigation.navigate('Home')} />
         <Image source={logo} style={styles.logo} />
         <Avatar
           containerStyle={styles.avatarContainer}
@@ -138,7 +148,7 @@ const navigation = useNavigation();
       </View>
       <TextInput style={styles.input} value={firstName} onChangeText={setFirstName} />
       <TextInput style={styles.input} value={email} onChangeText={setEmail} />
-      <TextInput style={styles.input} value={lastName} onChangeText={setLastName}  placeholder="Last Name" />
+      <TextInput style={styles.input} value={lastName} onChangeText={setLastName} placeholder="Last Name" />
       <TextInputMask
         style={styles.input}
         type={'custom'}
@@ -174,8 +184,12 @@ const navigation = useNavigation();
           />
         </View>
       </View>
-      <Button   buttonStyle={styles.logoutButton} title="Logout" onPress={handleLogout} />
-      <Button title="Save Changes" onPress={saveChanges} />
+      <View style={styles.buttonContainer}>
+        <Button title="Logout" onPress={handleLogout} />
+      </View>
+      <View style={styles.buttonContainer}>
+        <Button title="Save Changes" onPress={saveChanges} />
+      </View>
     </View>
   );
 }
@@ -209,6 +223,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 30,
+
   },
   personalInfoText: {
     fontSize: 18,
@@ -237,5 +252,9 @@ const styles = StyleSheet.create({
     borderWidth: 0,
     paddingHorizontal: 0,
     marginLeft: 0,
+  },
+  buttonContainer: {
+    marginBottom: 10,
+    marginTop: 10,
   },
 });
