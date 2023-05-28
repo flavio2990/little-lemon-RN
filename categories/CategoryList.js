@@ -1,67 +1,68 @@
 import React, { useState } from 'react';
-import { StyleSheet, FlatList, TouchableOpacity, Text } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
 const CategoryList = ({ categories, onSelectCategory }) => {
   const [selectedCategories, setSelectedCategories] = useState([]);
-  const handleSelectCategory = (category) => {
-    const isSelected = selectedCategories.includes(category);
-    let updatedSelectedCategories;
 
-    if (isSelected) {
-      updatedSelectedCategories = selectedCategories.filter((item) => item !== category);
+  const toggleCategory = (category) => {
+    if (selectedCategories.includes(category)) {
+      setSelectedCategories(selectedCategories.filter((c) => c !== category));
     } else {
-      updatedSelectedCategories = [...selectedCategories, category];
+      setSelectedCategories([...selectedCategories, category]);
     }
-
-    setSelectedCategories(updatedSelectedCategories);
-    onSelectCategory(updatedSelectedCategories);
-  };
-
-  const renderCategoryItem = ({ item }) => {
-    const isSelected = selectedCategories.includes(item);
-
-    return (
-      <TouchableOpacity
-        style={[styles.categoryItem, isSelected && styles.selectedCategoryItem]}
-        onPress={() => handleSelectCategory(item)}
-      >
-        <Text style={[styles.categoryText, isSelected && styles.selectedCategoryText]}>
-          {item}
-        </Text>
-      </TouchableOpacity>
-    );
   };
 
   return (
-    <FlatList
-      data={categories}
-      renderItem={renderCategoryItem}
-      keyExtractor={(item) => item}
-      style={styles.categoryList}
-    />
+    <View style={styles.container}>
+      {categories.map((category) => (
+        <TouchableOpacity
+          key={category}
+          style={[
+            styles.categoryButton,
+            selectedCategories.includes(category) && styles.selectedCategoryButton,
+          ]}
+          onPress={() => {
+            toggleCategory(category);
+            onSelectCategory(category, !selectedCategories.includes(category));
+          }}
+        >
+          <Text
+            style={[
+              styles.categoryText,
+              selectedCategories.includes(category) && styles.selectedCategoryText,
+            ]}
+          >
+            {category}
+          </Text>
+        </TouchableOpacity>
+      ))}
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  categoryList: {
-    flexGrow: 0,
-    marginBottom: 16,
+  container: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginVertical: 10,
   },
-  categoryItem: {
-    padding: 10,
-    backgroundColor: '#FFFFFF',
-    marginBottom: 8,
-    borderRadius: 5,
+  categoryButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: 'lightgray',
+    marginHorizontal: 5,
   },
-  selectedCategoryItem: {
-    backgroundColor: '#4CAF50', // Customize the selected background color
+  selectedCategoryButton: {
+    backgroundColor: 'darkgray',
   },
   categoryText: {
     fontSize: 16,
-    color: '#000000',
+    color: 'black',
   },
   selectedCategoryText: {
-    color: '#FFFFFF', // Customize the selected text color
+    color: 'white',
   },
 });
 
