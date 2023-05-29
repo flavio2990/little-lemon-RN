@@ -5,10 +5,11 @@ import { useNavigation } from '@react-navigation/native';
 import { Avatar } from 'react-native-elements';
 import { useRoute } from '@react-navigation/native';
 import axios from 'axios';
+import * as SQLite from 'expo-sqlite';
 
 const logo = require('../img/Logo.png');
 
-
+const db = SQLite.openDatabase('TheLittleLemon.db');
 const windowWidth = Dimensions.get('window').width;
 
 export default function HomeScreen() {
@@ -17,22 +18,60 @@ export default function HomeScreen() {
     const profileImage = route.params?.profileImage;
     const [menuData, setMenuData] = useState([]);
 
-    // fetch the menu data when the component mounts
     useEffect(() => {
-        fetchMenuData();
-    }, []);
+        db.transaction(tx => {
+            tx.executeSql('SELECT * FROM menu', [], (_, { rows }) => {
+                const storedMenuItems = rows._array;
 
+                if (storedMenuItems.length > 0) {
+                    setMenuData(storedMenuItems);
+                } else {
+                    fetchMenuData();
+                }
+            });
+        });
+    }, []);
     const fetchMenuData = async () => {
         try {
             const response = await axios.get(
                 'https://raw.githubusercontent.com/Meta-Mobile-Developer-PC/Working-With-Data-API/main/capstone.json'
             );
             const menuItems = response.data.menu;
+
+            // clear existing data from the table
+            db.transaction(tx => {
+                tx.executeSql('DELETE FROM menu', []);
+            });
+
+            // insert the fetched menu items into the table
+            db.transaction(tx => {
+                menuItems.forEach(item => {
+                    tx.executeSql(
+                        'INSERT INTO menu (name, price, description, image) VALUES (?, ?, ?, ?)',
+                        [item.name, item.price, item.description, item.image]
+                    );
+                });
+            });
+
+            // set the menu data state
             setMenuData(menuItems);
         } catch (error) {
             console.log('Error fetching menu data:', error);
         }
     };
+
+
+    db.transaction(tx => {
+        tx.executeSql(
+            `CREATE TABLE IF NOT EXISTS menu (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT,
+            price TEXT,
+            description TEXT,
+            image TEXT
+          );`
+        );
+    });
 
     const renderMenuItem = ({ item }) => (
         <View style={styles.menuItem}>
