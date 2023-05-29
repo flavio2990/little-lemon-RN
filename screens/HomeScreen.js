@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, Button, Image, Dimensions } from 'react-native';
+import { StyleSheet, Text, View, Button, Image, Dimensions, FlatList } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { Avatar } from 'react-native-elements';
 import { useRoute } from '@react-navigation/native';
+import axios from 'axios';
 
 const logo = require('../img/Logo.png');
 
@@ -14,8 +15,38 @@ export default function HomeScreen() {
     const navigation = useNavigation();
     const route = useRoute();
     const profileImage = route.params?.profileImage;
+    const [menuData, setMenuData] = useState([]);
 
+    // fetch the menu data when the component mounts
+    useEffect(() => {
+        fetchMenuData();
+    }, []);
 
+    const fetchMenuData = async () => {
+        try {
+            const response = await axios.get(
+                'https://raw.githubusercontent.com/Meta-Mobile-Developer-PC/Working-With-Data-API/main/capstone.json'
+            );
+            const menuItems = response.data.menu;
+            setMenuData(menuItems);
+        } catch (error) {
+            console.log('Error fetching menu data:', error);
+        }
+    };
+
+    const renderMenuItem = ({ item }) => (
+        <View style={styles.menuItem}>
+            <Image
+                source={{ uri: `https://github.com/Meta-Mobile-Developer-PC/Working-With-Data-API/blob/main/images/${item.image}?raw=true` }}
+                style={styles.menuItemImage}
+            />
+            <View style={styles.menuItemDetails}>
+                <Text style={styles.menuItemName}>{item.name}</Text>
+                <Text style={styles.menuItemPrice}>${item.price}</Text>
+                <Text style={styles.menuItemDescription}>{item.description}</Text>
+            </View>
+        </View>
+    );
 
     return (
         <View style={styles.container}>
@@ -28,10 +59,16 @@ export default function HomeScreen() {
                 <View style={styles.textContainer}>
                     <Text style={[styles.text, styles.title]}>Little Lemon</Text>
                     <Text style={[styles.text, styles.city]}>Chicago</Text>
-                    <Text style={[styles.text, styles.description]}>We are a family owned {'\n'} mediterranean restaurant{'\n'} focused on traditional{'\n'}recipes served with a {'\n'} modern twist</Text>
+                    <Text style={[styles.text, styles.description]}>We are a family-owned{'\n'}mediterranean restaurant{'\n'}focused on traditional{'\n'}recipes served with a{'\n'}modern twist</Text>
                     <Button title="Back" onPress={() => navigation.navigate('Profile')} />
                 </View>
             </View>
+            <FlatList
+                data={menuData}
+                renderItem={renderMenuItem}
+                keyExtractor={(item, index) => index.toString()}
+                contentContainerStyle={styles.menuList}
+            />
         </View>
     );
 }
@@ -95,11 +132,39 @@ const styles = StyleSheet.create({
     city: {
         fontSize: 25,
         marginBottom: 18,
-        color: '#EDEFEE'
+        color: '#EDEFEE',
     },
     description: {
         fontSize: 20,
         marginBottom: 0,
-        color: '#EDEFEE'
+        color: '#EDEFEE',
     },
-})
+    menuList: {
+        paddingBottom: 16,
+    },
+    menuItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 16,
+    },
+    menuItemImage: {
+        width: 100,
+        height: 100,
+        resizeMode: 'cover',
+        borderRadius: 10,
+        marginRight: 10,
+    },
+    menuItemName: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 4,
+    },
+    menuItemPrice: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        marginBottom: 4,
+    },
+    menuItemDescription: {
+        fontSize: 14,
+    },
+});
