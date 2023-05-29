@@ -1,67 +1,67 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 
-const CategoryList = ({ categories, onSelectCategory }) => {
+const categories = [
+  { id: 1, name: 'Starters' },
+  { id: 2, name: 'Mains' },
+  { id: 3, name: 'Desserts' },
+];
+
+const CategoryList = () => {
   const [selectedCategories, setSelectedCategories] = useState([]);
 
-  const toggleCategory = (category) => {
-    if (selectedCategories.includes(category)) {
-      setSelectedCategories(selectedCategories.filter((c) => c !== category));
+  const toggleCategory = (categoryId) => {
+    const categoryIndex = selectedCategories.indexOf(categoryId);
+    if (categoryIndex !== -1) {
+      setSelectedCategories(prevState => prevState.filter(id => id !== categoryId));
     } else {
-      setSelectedCategories([...selectedCategories, category]);
+      setSelectedCategories(prevState => [...prevState, categoryId]);
     }
   };
 
   return (
-    <View style={styles.container}>
-      {categories.map((category) => (
+    <ScrollView style={styles.container}>
+      {categories.map(category => (
         <TouchableOpacity
-          key={category}
+          key={category.id}
           style={[
-            styles.categoryButton,
-            selectedCategories.includes(category) && styles.selectedCategoryButton,
+            styles.categoryItem,
+            selectedCategories.includes(category.id) && styles.selectedCategoryItem
           ]}
-          onPress={() => {
-            toggleCategory(category);
-            onSelectCategory(category, !selectedCategories.includes(category));
-          }}
+          onPress={() => toggleCategory(category.id)}
         >
           <Text
             style={[
-              styles.categoryText,
-              selectedCategories.includes(category) && styles.selectedCategoryText,
+              styles.categoryName,
+              selectedCategories.includes(category.id) && styles.selectedCategoryName
             ]}
           >
-            {category}
+            {category.name}
           </Text>
         </TouchableOpacity>
       ))}
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginVertical: 10,
+    flex: 1,
+    paddingHorizontal: 16,
   },
-  categoryButton: {
-    paddingHorizontal: 12,
+  categoryItem: {
     paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: 'lightgray',
-    marginHorizontal: 5,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
   },
-  selectedCategoryButton: {
-    backgroundColor: 'darkgray',
+  selectedCategoryItem: {
+    backgroundColor: '#ccc',
   },
-  categoryText: {
+  categoryName: {
     fontSize: 16,
     color: 'black',
   },
-  selectedCategoryText: {
+  selectedCategoryName: {
     color: 'white',
   },
 });
