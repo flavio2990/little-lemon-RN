@@ -61,21 +61,29 @@ export const clearMenuTable = () => {
   });
 };
 /// esto va al categorylist
-export const getFilteredMenu = (selectedCategories, callback) => {   db.transaction(tx => {
-  let query = 'SELECT * FROM menu';
+export const getFilteredMenu = (selectedCategories, callback) => {
+  db.transaction(tx => {
+    let query = 'SELECT * FROM menu';
 
-  if (selectedCategories.length > 0) {
-    const categoryNames = selectedCategories.map(category => `"${category}"`).join(',');
-    query += ` WHERE INSTR(CONCAT(',', category, ','), CONCAT(',', category_names, ',')) > 0`;
-  }
+    if (selectedCategories.length > 0) {
+      const placeholders = selectedCategories.map(() => '?').join(',');
+      query += ` WHERE category IN (${placeholders})`;
+    }
 
-  tx.executeSql(query, [], (_, { rows }) => {
-    const filteredItems = rows._array;
-    console.log('consola muestra de database de la funcion getFilteredMenu', filteredItems);
-callback(filteredItems);
-});
-});
+    tx.executeSql(query, selectedCategories, (_, { rows }) => {
+      const filteredItems = rows._array;
+      callback(filteredItems);
+    });
+  });
 };
 
 
-
+////
+export const getCategories = (callback) => {
+  db.transaction(tx => {
+    tx.executeSql('SELECT DISTINCT category FROM menu', [], (_, { rows }) => {
+      const categories = rows._array.map(item => ({ name: item.category }));
+      callback(categories);
+    });
+  });
+};
