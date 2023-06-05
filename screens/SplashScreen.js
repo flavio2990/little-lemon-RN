@@ -1,12 +1,19 @@
-import React, { useEffect } from 'react';
+import React, { useEffect,useState  } from 'react';
 import { StyleSheet, View, Image } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const SplashScreen = ({ navigation }) => {
-  useEffect(() => {
-    setTimeout(() => {
-      navigation.navigate('Profile'); 
-    }, 2000); 
-  }, [navigation]);
+  const getIsCompleted = async () => {
+    isOnboarding = await AsyncStorage.getItem('onboardingStatus');
+    console.log (isOnboarding)
+    isOnboarding === 'completed' ? navigation.navigate('Home') : navigation.navigate('Onboarding')
+}
+useEffect(() => {
+  setTimeout(()=>{
+    getIsCompleted()
+  },3000 )
+});
 
   return (
     <View style={styles.container}>
