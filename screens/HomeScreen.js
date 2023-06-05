@@ -23,22 +23,13 @@ export default function HomeScreen() {
         'https://raw.githubusercontent.com/Meta-Mobile-Developer-PC/Working-With-Data-API/main/capstone.json'
       );
       const menuItems = response.data.menu;
-
-      // create the menu table
       createMenuTable();
-
-      // clear existing data from the table
       clearMenuTable();
-
-      // insert the fetched menu items into the table
       menuItems.forEach(item => {
         insertMenuItem(item);
       });
-      
-      // set the menu data state
       setMenuData(menuItems);
     } catch (error) {
-      console.log('Error fetching menu data:', error);
     }
   };
 
@@ -64,12 +55,6 @@ export default function HomeScreen() {
       <CategoryList menuData={menuData} />
       <View>
       </View>
-      {/* <FlatList
-          data={menuData}
-          renderItem={renderMenuItem}
-          keyExtractor={(item, index) => index.toString()}
-          contentContainerStyle={styles.menuList}
-      /> */}
     </View>
   );
 }

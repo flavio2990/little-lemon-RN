@@ -1,21 +1,28 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
+import React, { useState, useEffect, useRef} from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, TextInput } from 'react-native';
 import * as SQLite from 'expo-sqlite';
-import { getFilteredMenu, getCategories } from '../database';
+import { getFilteredMenu, getCategories, searchMenuItems } from '../database';
+import _ from 'lodash';
 
-const db = SQLite.openDatabase('TheLittleLemon.db');
 
-const CategoryList = (props) => {
+const CategoryList = () => {
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [filteredMenu, setFilteredMenu] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
+  const debounceSearch = useRef(_.debounce((query) => {
+    searchMenuItems(query, selectedCategories, (filteredItems) => {
+      setFilteredMenu(filteredItems);
+    });
+  }, 500)).current;
+  
   const applyFilter = () => {
-    getFilteredMenu(selectedCategories, (filteredItems) => {
+    getFilteredMenu(selectedCategories, searchQuery, (filteredItems) => {
       setFilteredMenu(filteredItems);
     });
   };
-
+  
   const toggleCategory = (categoryId) => {
     setSelectedCategories((prevCategories) => {
       const categoryIndex = prevCategories.indexOf(categoryId);
@@ -39,42 +46,53 @@ const CategoryList = (props) => {
 
   return (
     <ScrollView style={styles.container}>
-      {categories.map((category) => (
-        <TouchableOpacity
-          key={category.name}
-          style={[
-            styles.categoryItem,
-            selectedCategories.includes(category.name) && styles.selectedCategoryItem,
-          ]}
-          onPress={() => toggleCategory(category.name)}
-        >
-          <Text
+      <View >
+        <TextInput
+          style={styles.searchBar}
+          placeholder="Search dishes..."
+          value={searchQuery}
+          onChangeText={(text) => {
+            setSearchQuery(text);
+            debounceSearch(text);
+          }}
+        />
+      </View>
+      <View>
+        {categories.map((category) => (
+          <TouchableOpacity
+            key={category.name}
             style={[
-              styles.categoryName,
-              selectedCategories.includes(category.name) && styles.selectedCategoryName,
+              styles.categoryItem,
+              selectedCategories.includes(category.name) && styles.selectedCategoryItem,
             ]}
+            onPress={() => toggleCategory(category.name)}
           >
-            {category.name}
-          </Text>
-        </TouchableOpacity>
-      ))}
-
-      {/* render only the filtered menu items */}
-      {filteredMenu.map((item) => (
-        <View key={item.name} style={styles.menuItem}>
-          <Image
-            source={{
-              uri: `https://github.com/Meta-Mobile-Developer-PC/Working-With-Data-API/blob/main/images/${item.image}?raw=true`,
-            }}
-            style={styles.menuItemImage}
-          />
-          <View style={styles.menuItemDetails}>
-            <Text style={styles.menuItemName}>{item.name}</Text>
-            <Text style={styles.menuItemPrice}>${item.price}</Text>
-            <Text style={styles.menuItemDescription}>{item.description}</Text>
+            <Text
+              style={[
+                styles.categoryName,
+                selectedCategories.includes(category.name) && styles.selectedCategoryName,
+              ]}
+            >
+              {category.name}
+            </Text>
+          </TouchableOpacity>
+        ))}
+        {filteredMenu.map((item) => (
+          <View key={item.name} style={styles.menuItem}>
+            <Image
+              source={{
+                uri: `https://github.com/Meta-Mobile-Developer-PC/Working-With-Data-API/blob/main/images/${item.image}?raw=true`,
+              }}
+              style={styles.menuItemImage}
+            />
+            <View style={styles.menuItemDetails}>
+              <Text style={styles.menuItemName}>{item.name}</Text>
+              <Text style={styles.menuItemPrice}>${item.price}</Text>
+              <Text style={styles.menuItemDescription}>{item.description}</Text>
+            </View>
           </View>
-        </View>
-      ))}
+        ))}
+      </View>
     </ScrollView>
   );
 };
@@ -83,6 +101,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 16,
+    marginRight: 10,
   },
   categoryItem: {
     paddingVertical: 5,

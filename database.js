@@ -1,8 +1,7 @@
 import * as SQLite from 'expo-sqlite';
 
-const db = SQLite.openDatabase('LittleLemon.db');
+const db = SQLite.openDatabase('little_lemon.db');
 
-// Método para crear la tabla de menú
 export const createMenuTable = () => {
   db.transaction(tx => {
     tx.executeSql(
@@ -17,14 +16,12 @@ export const createMenuTable = () => {
       [],
       (_, { rowsAffected }) => {
         if (rowsAffected > 0) {
-          // console.log('Table "menu" created successfully.');
         }
       }
     );
   });
 };
 
-// Método para insertar un nuevo ítem de menú
 export const insertMenuItem = (menuItem) => {
   const { name, price, description, image, category } = menuItem;
   db.transaction(tx => {
@@ -33,14 +30,12 @@ export const insertMenuItem = (menuItem) => {
       [name, price, description, image, category],
       (_, { rowsAffected }) => {
         if (rowsAffected > 0) {
-          // console.log('Menu item inserted successfullyy.');
         }
       }
     );
   });
 };
 
-// Método para obtener todos los ítems de menú
 export const getMenuItems = (callback) => {
   db.transaction(tx => {
     tx.executeSql('SELECT * FROM menu', [], (_, { rows }) => {
@@ -50,24 +45,27 @@ export const getMenuItems = (callback) => {
   });
 };
 
-// Método para borrar todos los ítems de menú
 export const clearMenuTable = () => {
   db.transaction(tx => {
     tx.executeSql('DELETE FROM menu', [], (_, { rowsAffected }) => {
       if (rowsAffected > 0) {
-        // console.log('Menu table cleared successfull.');
       }
     });
   });
 };
-/// esto va al categorylist
-export const getFilteredMenu = (selectedCategories, callback) => {
+
+export const getFilteredMenu = (selectedCategories, searchQuery, callback) => {
   db.transaction(tx => {
     let query = 'SELECT * FROM menu';
 
     if (selectedCategories.length > 0) {
       const placeholders = selectedCategories.map(() => '?').join(',');
       query += ` WHERE category IN (${placeholders})`;
+    }
+
+    if (searchQuery.length > 0) {
+      query += selectedCategories.length > 0 ? ' AND' : ' WHERE';
+      query += ` name LIKE '%${searchQuery}%'`;
     }
 
     tx.executeSql(query, selectedCategories, (_, { rows }) => {
@@ -77,13 +75,32 @@ export const getFilteredMenu = (selectedCategories, callback) => {
   });
 };
 
-
-////
 export const getCategories = (callback) => {
   db.transaction(tx => {
     tx.executeSql('SELECT DISTINCT category FROM menu', [], (_, { rows }) => {
       const categories = rows._array.map(item => ({ name: item.category }));
       callback(categories);
+    });
+  });
+};
+
+export const searchMenuItems = (query, selectedCategories, callback) => {
+  db.transaction(tx => {
+    let sqlQuery = 'SELECT * FROM menu';
+
+    if (selectedCategories.length > 0) {
+      const placeholders = selectedCategories.map(() => '?').join(',');
+      sqlQuery += ` WHERE category IN (${placeholders})`;
+    }
+
+    if (query.length > 0) {
+      sqlQuery += selectedCategories.length > 0 ? ' AND' : ' WHERE';
+      sqlQuery += ` name LIKE '%${query}%'`;
+    }
+
+    tx.executeSql(sqlQuery, selectedCategories, (_, { rows }) => {
+      const filteredItems = rows._array;
+      callback(filteredItems);
     });
   });
 };

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TextInput, Button, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
@@ -8,7 +8,6 @@ export default function OnboardingScreen() {
 
     const [firstName, setFirstName] = useState('');
     const [email, setEmail] = useState('');
-    const [isOnboardingCompleted, setIsOnboardingCompleted] = useState(false);
     const navigation = useNavigation();
 
 
@@ -21,33 +20,34 @@ export default function OnboardingScreen() {
     };
     const handleOnboardingComplete = async () => {
         if (firstName.trim() === '') {
-          alert('Please enter your first name.');
+            alert('Please enter your first name.');
         } else if (!validateEmail(email)) {
-          alert('Please enter a valid email address.');
+            alert('Please enter a valid email address.');
         } else {
-          try {
-            setIsOnboardingCompleted(true);
-      
-            const data = {
-              firstName: firstName,
-              email: email,
-            };
-      
-            const serializedData = JSON.stringify(data);
-      
-            await AsyncStorage.setItem('@data', serializedData);
-            await AsyncStorage.setItem('onboardingStatus', 'completed');
-            alert('Onboarding completed!');
-            navigation.navigate('Profile');
-          } catch (error) {
-            console.log('Error saving onboarding data:', error.message);
-          }
+            try {
+                const data = {
+                    firstName: firstName,
+                    email: email,
+                };
+
+                const serializedData = JSON.stringify(data);
+
+                await AsyncStorage.setItem('@data', serializedData);
+                await AsyncStorage.setItem('onboardingStatus', 'completed');
+                alert('Onboarding completed!');
+                navigation.navigate('Profile');
+            } catch (error) {
+                console.log('Error saving onboarding data:', error.message);
+            }
         }
-      };
-          const validateEmail = (email) => {
+    };
+    const validateEmail = (email) => {
         const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
         return emailRegex.test(email);
     };
+
+   
+
     const isNextButtonDisabled = firstName.trim() === '' || !validateEmail(email);
     return (
         <View style={styles.container}>

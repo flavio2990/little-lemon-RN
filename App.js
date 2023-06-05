@@ -30,17 +30,15 @@ export default function App() {
     }
   };
 
+
+
   return (
     <NavigationContainer >
-      <Stack.Navigator >
-        {isOnboardingCompleted ? (
-          <>
-            <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
-            <Stack.Screen name="Profile" component={ProfileScreen} options={{ headerShown: false }}/>
-          </>
-        ) : (
-          <Stack.Screen name="Onboarding" component={OnboardingScreen} options={{ headerShown: false }}/>
-        )}
+      <Stack.Navigator initialRouteName="Splash">
+      <Stack.Screen name='Splash' component={SplashScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Onboarding" component={OnboardingScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Profile" component={ProfileScreen} options={{ headerShown: false }} />
       </Stack.Navigator>
       <StatusBar style="auto" />
     </NavigationContainer>
