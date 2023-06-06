@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useCallback } from 'react';
 import { StyleSheet, Text, View, TextInput, Image, Button } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TextInputMask } from 'react-native-masked-text';
 import * as ImagePicker from 'expo-image-picker';
 import { Avatar, CheckBox } from 'react-native-elements';
 import { useNavigation } from '@react-navigation/native';
+import {useFonts} from 'expo-font';
 
 
 const logo = require('../img/Logo.png');
@@ -19,7 +20,7 @@ export default function ProfileScreen() {
   const [isEmailNotificationEnabled, setIsEmailNotificationEnabled] = useState(false);
   const [isNotification1Enabled, setIsNotification1Enabled] = useState(false);
   const [isNotification2Enabled, setIsNotification2Enabled] = useState(false);
-
+  
   const navigation = useNavigation();
 
   const checkData = async () => {
@@ -56,12 +57,19 @@ export default function ProfileScreen() {
     }
   };
 
+  const [fontsLoaded] = useFonts({
+    'Karla-Regular': require('../assets/fonts/Karla-Regular.ttf'),
+  });
+
+
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       checkData();
     });
     return unsubscribe;
   }, [navigation]);
+
+
   const saveChanges = async () => {
     try {
       await AsyncStorage.setItem('@firstName', firstName);
@@ -84,6 +92,8 @@ export default function ProfileScreen() {
     }
   };
 
+  
+
   const handleLogout = async () => {
     try {
       await AsyncStorage.clear();
@@ -92,6 +102,9 @@ export default function ProfileScreen() {
       console.log('Error logging out:', error.message);
     }
   };
+
+  
+  
 
   const pickImage = async () => {
     try {
@@ -110,13 +123,16 @@ export default function ProfileScreen() {
     }
   };
 
-  if (!isDataLoaded) {
+
+  if (!isDataLoaded || !fontsLoaded) {
     return (
       <View style={styles.container}>
         <Text>Loading data...</Text>
       </View>
     );
   }
+
+  
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -132,8 +148,8 @@ export default function ProfileScreen() {
           onPress={pickImage}
         />
       </View>
-      <View style={styles.personalInfoContainer}>
-        <Text>Personal Information</Text>
+      <View style={styles.personalInfoContainer} >
+        <Text style={styles.profileInfoText}>Profile Information</Text>
       </View>
       <View style={styles.personalInfoText}>
         <Avatar
@@ -224,6 +240,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 30,
 
+  },
+  profileInfoText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 30,
+    fontFamily: 'Karla-Regular',
   },
   personalInfoText: {
     fontSize: 18,
