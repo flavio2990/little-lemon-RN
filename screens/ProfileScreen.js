@@ -1,11 +1,13 @@
-import React, { useState, useEffect,useCallback } from 'react';
-import { StyleSheet, Text, View, TextInput, Image, Button } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { StyleSheet, Text, View, TextInput, Image, Button, Pressable } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TextInputMask } from 'react-native-masked-text';
 import * as ImagePicker from 'expo-image-picker';
 import { Avatar, CheckBox } from 'react-native-elements';
 import { useNavigation } from '@react-navigation/native';
-import {useFonts} from 'expo-font';
+import { useFonts } from 'expo-font';
+import { TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 
 const logo = require('../img/Logo.png');
@@ -20,7 +22,7 @@ export default function ProfileScreen() {
   const [isEmailNotificationEnabled, setIsEmailNotificationEnabled] = useState(false);
   const [isNotification1Enabled, setIsNotification1Enabled] = useState(false);
   const [isNotification2Enabled, setIsNotification2Enabled] = useState(false);
-  
+
   const navigation = useNavigation();
 
   const checkData = async () => {
@@ -92,7 +94,7 @@ export default function ProfileScreen() {
     }
   };
 
-  
+
 
   const handleLogout = async () => {
     try {
@@ -103,8 +105,8 @@ export default function ProfileScreen() {
     }
   };
 
-  
-  
+
+
 
   const pickImage = async () => {
     try {
@@ -132,11 +134,14 @@ export default function ProfileScreen() {
     );
   }
 
-  
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Button title="Back" onPress={() => navigation.navigate('Home')} />
+        {/* <Button title="Back" onPress={() => navigation.navigate('Home')} /> */}
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('Home')}>
+          <Ionicons name="arrow-back" size={24} color="white" />
+        </TouchableOpacity>
         <Image source={logo} style={styles.logo} />
         <Avatar
           containerStyle={styles.avatarContainer}
@@ -200,11 +205,21 @@ export default function ProfileScreen() {
           />
         </View>
       </View>
-      <View style={styles.buttonContainer}>
+      {/* <View style={styles.buttonContainer}>
         <Button title="Logout" onPress={handleLogout} />
-      </View>
+      </View> */}
       <View style={styles.buttonContainer}>
+        <Pressable style={styles.button} onPress={handleLogout}>
+          <Text style={styles.buttonText}>Logout</Text>
+        </Pressable>
+      </View>
+      {/* <View style={styles.buttonContainer}>
         <Button title="Save Changes" onPress={saveChanges} />
+      </View> */}
+      <View style={styles.buttonContainer}>
+        <Pressable style={styles.button} onPress={saveChanges}>
+          <Text style={styles.buttonText}>Save Changes</Text>
+        </Pressable>
       </View>
     </View>
   );
@@ -225,6 +240,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 16,
     marginBottom: 30,
+  },
+  backButton: {
+    backgroundColor: '#495E57',
+    borderRadius: 100,
+    padding: 10,
+    marginRight: 16,
   },
   input: {
     height: 40,
@@ -278,5 +299,19 @@ const styles = StyleSheet.create({
   buttonContainer: {
     marginBottom: 10,
     marginTop: 10,
+  },
+  button: {
+    backgroundColor: '#F4CE14',
+    borderColor: '#EE9972',
+    borderWidth: 1,
+    borderRadius: 10,
+    padding: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 200,
+  },
+  buttonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });

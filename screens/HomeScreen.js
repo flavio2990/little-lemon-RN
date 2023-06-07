@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, Button, Image, Dimensions, FlatList } from 'react-native';
+import { StyleSheet, Text, View, Button, Image, Dimensions, TouchableOpacity, TextInput } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { Avatar } from 'react-native-elements';
 import { useRoute } from '@react-navigation/native';
 import axios from 'axios';
-import { createMenuTable, insertMenuItem, getMenuItems, clearMenuTable } from '../database';
+import { createMenuTable, insertMenuItem, clearMenuTable } from '../database';
 import CategoryList from '../categories/CategoryList';
+import _ from 'lodash';
 
 const logo = require('../img/Logo.png');
 const windowWidth = Dimensions.get('window').width;
@@ -37,11 +38,17 @@ export default function HomeScreen() {
     fetchMenuData();
   }, []);
 
+  const navigateToProfile = () => {
+    navigation.navigate('Profile');
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Image source={logo} style={styles.logo} />
-        <Avatar containerStyle={styles.avatarContainer} avatarStyle={styles.avatar} size="medium" rounded source={profileImage ? { uri: profileImage } : null} />
+        <TouchableOpacity style={styles.avatarContainer} onPress={navigateToProfile}>
+          <Avatar avatarStyle={styles.avatar} size="medium" rounded source={profileImage ? { uri: profileImage } : null} />
+        </TouchableOpacity>
       </View>
       <View style={styles.contentContainer}>
         <Image source={require('../img/waiter.png')} style={styles.waiter} />
@@ -49,7 +56,6 @@ export default function HomeScreen() {
           <Text style={[styles.text, styles.title]}>Little Lemon</Text>
           <Text style={[styles.text, styles.city]}>Chicago</Text>
           <Text style={[styles.text, styles.description]}>We are a family-owned{'\n'}mediterranean restaurant{'\n'}focused on traditional{'\n'}recipes served with a{'\n'}modern twist</Text>
-          <Button title="Back" onPress={() => navigation.navigate('Profile')} />
         </View>
       </View>
       <CategoryList menuData={menuData} />
@@ -70,9 +76,10 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   waiter: {
+    marginTop:40,
     width: 200,
     height: 200,
-    resizeMode: 'contain',
+    resizeMode: 'cover',
     borderRadius: 10,
     marginBottom: 20,
   },
@@ -94,6 +101,7 @@ const styles = StyleSheet.create({
     paddingTop: 16,
     marginBottom: 30,
   },
+  //hero
   contentContainer: {
     backgroundColor: '#495E57',
     flexDirection: 'row-reverse',

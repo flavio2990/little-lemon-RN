@@ -6,7 +6,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const SplashScreen = ({ navigation }) => {
   const getIsCompleted = async () => {
     isOnboarding = await AsyncStorage.getItem('onboardingStatus');
-    console.log (isOnboarding)
     isOnboarding === 'completed' ? navigation.navigate('Home') : navigation.navigate('Onboarding')
 }
 useEffect(() => {
