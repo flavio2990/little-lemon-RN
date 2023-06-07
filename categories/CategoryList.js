@@ -60,7 +60,7 @@ const CategoryList = () => {
           }}
         />
       </View>
-      <View >
+      <View style={styles.categoryContainer}>
         {categories.map((category) => (
           <TouchableOpacity
             key={category.name}
@@ -80,6 +80,8 @@ const CategoryList = () => {
             </Text>
           </TouchableOpacity>
         ))}
+      </View>
+      <ScrollView>
         {filteredMenu.map((item) => (
           <View key={item.name} style={styles.menuItem}>
             <Image
@@ -95,29 +97,34 @@ const CategoryList = () => {
             </View>
           </View>
         ))}
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </ScrollView >
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    // flex:1,
     alignItems: 'stretch',
     padding: 10,
   },
-  scrollMenu:{
-    alignItems:'stretch',
+  scrollMenu: {
+    alignItems: 'stretch',
   },
   categoryItem: {
+    marginLeft: 10,
+    borderWidth: 1,
+    borderRadius: 10,
+    width: 80,
+    height: 40,
     paddingVertical: 5,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
   },
   selectedCategoryItem: {
     backgroundColor: '#ccc',
   },
   categoryName: {
+    marginLeft: '5%',
+    justifyContent: 'center',
+    alignContent: 'center',
     // backgroundColor:'black',
     fontSize: 16,
     color: 'black',
@@ -125,13 +132,11 @@ const styles = StyleSheet.create({
   selectedCategoryName: {
     color: 'white',
   },
-  menuItemDetails:{
-    // backgroundColor:'white',
-
+  menuItemDetails: {
+    marginLeft: 10
   },
   menuItem: {
     alignItems: 'center',
-    // con row se ve acomodado, la img a la iz y los txts a la derecha
     flexDirection: 'row',
     marginBottom: 16,
     marginLeft: 10,
@@ -160,8 +165,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#EDEFEE',
   },
   searchBarContainer: {
-    marginLeft: "0%",
-    marginRight: "10%",
     paddingHorizontal: 20,
     backgroundColor: '#495E57',
   },
@@ -169,6 +172,12 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     borderBottomColor: 'transparent',
     borderTopColor: 'transparent',
+  },
+  categoryContainer: {
+    justifyContent: 'space-evenly',
+    flexDirection: 'row',
+    marginTop: 10,
+    marginBottom: 10,
   },
 });
 
