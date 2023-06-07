@@ -46,7 +46,7 @@ const CategoryList = () => {
   }, []);
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView contentContainerStyle={{ alignItems: "stretch" }}>
       <View style={styles.searchBarContainer}>
         <SearchBar
           platform="default"
@@ -60,7 +60,7 @@ const CategoryList = () => {
           }}
         />
       </View>
-      <View>
+      <View >
         {categories.map((category) => (
           <TouchableOpacity
             key={category.name}
@@ -103,8 +103,11 @@ const CategoryList = () => {
 const styles = StyleSheet.create({
   container: {
     // flex:1,
-    backgroundColor:'red',
+    alignItems: 'stretch',
     padding: 10,
+  },
+  scrollMenu:{
+    alignItems:'stretch',
   },
   categoryItem: {
     paddingVertical: 5,
@@ -115,7 +118,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ccc',
   },
   categoryName: {
-    backgroundColor:'black',
+    // backgroundColor:'black',
     fontSize: 16,
     color: 'black',
   },
@@ -123,38 +126,33 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   menuItemDetails:{
-    backgroundColor:'white',
+    // backgroundColor:'white',
 
   },
   menuItem: {
-    flex:1,
     alignItems: 'center',
-    // flexDirection: 'row', con row se ve acomodado, la img a la iz y los txts a la derecha
-    flexDirection:'column',
+    // con row se ve acomodado, la img a la iz y los txts a la derecha
+    flexDirection: 'row',
     marginBottom: 16,
     marginLeft: 10,
   },
   menuItemImage: {
-    backgroundColor:'green',
     width: 100,
     height: 100,
     resizeMode: 'cover',
     borderRadius: 10,
   },
   menuItemName: {
-    backgroundColor:'blue',
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 4,
   },
   menuItemPrice: {
-    backgroundColor:'yellow',
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 4,
   },
   menuItemDescription: {
-    backgroundColor:'grey',
     fontSize: 14,
   },
   searchBarInputContainer: {
