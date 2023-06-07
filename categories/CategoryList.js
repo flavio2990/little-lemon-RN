@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { getFilteredMenu, getCategories, searchMenuItems } from '../database';
 import _ from 'lodash';
 import { SearchBar } from 'react-native-elements';
