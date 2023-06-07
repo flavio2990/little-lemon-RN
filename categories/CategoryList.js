@@ -109,9 +109,11 @@ const styles = StyleSheet.create({
     alignItems: 'stretch',
   },
   categoryItem: {
+    backgroundColor:'#EDEFEE',
+    borderWidth:1,
+    borderColor:'#a9a9a9',
     marginLeft: 10,
-    borderWidth: 1,
-    borderRadius: 10,
+    borderRadius: 20,
     width: 80,
     height: 40,
     paddingVertical: 5,
@@ -123,9 +125,10 @@ const styles = StyleSheet.create({
     marginLeft: '5%',
     justifyContent: 'center',
     alignContent: 'center',
-    // backgroundColor:'black',
     fontSize: 16,
-    color: 'black',
+    color: '#495E57',
+    fontWeight: 'bold',
+
   },
   selectedCategoryName: {
     color: 'white',
@@ -149,17 +152,22 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 4,
+    color: 'black',
+
   },
   menuItemPrice: {
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 4,
+    color: '#495E57',
+
   },
   menuItemDescription: {
     fontSize: 14,
+    color: '#495E57',
+
   },
   searchBarInputContainer: {
-    width: '100%',
     backgroundColor: '#EDEFEE',
   },
   searchBarContainer: {

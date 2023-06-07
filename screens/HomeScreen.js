@@ -96,18 +96,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    width: '100%',
     paddingHorizontal: 16,
     paddingTop: 16,
     marginBottom: 30,
   },
-  //hero
   contentContainer: {
     backgroundColor: '#495E57',
     flexDirection: 'row-reverse',
     alignItems: 'center',
     justifyContent: 'space-evenly',
-    width: '100%',
     paddingHorizontal: 16,
     paddingTop: 16,
     marginBottom: 0,
