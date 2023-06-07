@@ -4,7 +4,6 @@ import { getFilteredMenu, getCategories, searchMenuItems } from '../database';
 import _ from 'lodash';
 import { SearchBar } from 'react-native-elements';
 
-// const windowWidth = Dimensions.get('window').width;
 
 const CategoryList = () => {
   const [selectedCategories, setSelectedCategories] = useState([]);
@@ -46,7 +45,7 @@ const CategoryList = () => {
   }, []);
 
   return (
-    <ScrollView contentContainerStyle={{ alignItems: "stretch" }}>
+    <ScrollView contentContainerStyle={{ alignItems: "stretch" }} stickyHeaderIndices={[0]}>
       <View style={styles.searchBarContainer}>
         <SearchBar
           platform="default"
@@ -81,26 +80,25 @@ const CategoryList = () => {
           </TouchableOpacity>
         ))}
       </View>
-      <ScrollView>
-        {filteredMenu.map((item) => (
-          <View key={item.name} style={styles.menuItem}>
-            <Image
-              source={{
-                uri: `https://github.com/Meta-Mobile-Developer-PC/Working-With-Data-API/blob/main/images/${item.image}?raw=true`,
-              }}
-              style={styles.menuItemImage}
-            />
-            <View style={styles.menuItemDetails}>
-              <Text style={styles.menuItemName}>{item.name}</Text>
-              <Text style={styles.menuItemPrice}>${item.price}</Text>
-              <Text style={styles.menuItemDescription}>{item.description}</Text>
-            </View>
+      {filteredMenu.map((item) => (
+        <View key={item.name} style={styles.menuItem}>
+          <Image
+            source={{
+              uri: `https://github.com/Meta-Mobile-Developer-PC/Working-With-Data-API/blob/main/images/${item.image}?raw=true`,
+            }}
+            style={styles.menuItemImage}
+          />
+          <View style={styles.menuItemDetails}>
+            <Text style={styles.menuItemName}>{item.name}</Text>
+            <Text style={styles.menuItemPrice}>${item.price}</Text>
+            <Text style={styles.menuItemDescription}>{item.description}</Text>
           </View>
-        ))}
-      </ScrollView>
+        </View>
+      ))}
     </ScrollView >
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
