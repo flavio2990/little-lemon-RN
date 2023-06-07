@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { getFilteredMenu, getCategories, searchMenuItems } from '../database';
 import _ from 'lodash';
 import { SearchBar } from 'react-native-elements';
 
-// const windowWidth = Dimensions.get('window').width;
 
 const CategoryList = () => {
   const [selectedCategories, setSelectedCategories] = useState([]);
@@ -46,7 +45,7 @@ const CategoryList = () => {
   }, []);
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView contentContainerStyle={{ alignItems: "stretch" }} stickyHeaderIndices={[0]}>
       <View style={styles.searchBarContainer}>
         <SearchBar
           platform="default"
@@ -60,7 +59,7 @@ const CategoryList = () => {
           }}
         />
       </View>
-      <View>
+      <View style={styles.categoryContainer}>
         {categories.map((category) => (
           <TouchableOpacity
             key={category.name}
@@ -80,81 +79,83 @@ const CategoryList = () => {
             </Text>
           </TouchableOpacity>
         ))}
-        {filteredMenu.map((item) => (
-          <View key={item.name} style={styles.menuItem}>
-            <Image
-              source={{
-                uri: `https://github.com/Meta-Mobile-Developer-PC/Working-With-Data-API/blob/main/images/${item.image}?raw=true`,
-              }}
-              style={styles.menuItemImage}
-            />
-            <View style={styles.menuItemDetails}>
-              <Text style={styles.menuItemName}>{item.name}</Text>
-              <Text style={styles.menuItemPrice}>${item.price}</Text>
-              <Text style={styles.menuItemDescription}>{item.description}</Text>
-            </View>
-          </View>
-        ))}
       </View>
-    </ScrollView>
+      {filteredMenu.map((item) => (
+        <View key={item.name} style={styles.menuItem}>
+          <Image
+            source={{
+              uri: `https://github.com/Meta-Mobile-Developer-PC/Working-With-Data-API/blob/main/images/${item.image}?raw=true`,
+            }}
+            style={styles.menuItemImage}
+          />
+          <View style={styles.menuItemDetails}>
+            <Text style={styles.menuItemName}>{item.name}</Text>
+            <Text style={styles.menuItemPrice}>${item.price}</Text>
+            <Text style={styles.menuItemDescription}>{item.description}</Text>
+          </View>
+        </View>
+      ))}
+    </ScrollView >
   );
 };
 
+
 const styles = StyleSheet.create({
   container: {
-    // flex:1,
-    backgroundColor:'red',
+    alignItems: 'stretch',
     padding: 10,
   },
+  scrollMenu: {
+    alignItems: 'stretch',
+  },
   categoryItem: {
+    marginLeft: 10,
+    borderWidth: 1,
+    borderRadius: 10,
+    width: 80,
+    height: 40,
     paddingVertical: 5,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
   },
   selectedCategoryItem: {
     backgroundColor: '#ccc',
   },
   categoryName: {
-    backgroundColor:'black',
+    marginLeft: '5%',
+    justifyContent: 'center',
+    alignContent: 'center',
+    // backgroundColor:'black',
     fontSize: 16,
     color: 'black',
   },
   selectedCategoryName: {
     color: 'white',
   },
-  menuItemDetails:{
-    backgroundColor:'white',
-
+  menuItemDetails: {
+    marginLeft: 10
   },
   menuItem: {
-    flex:1,
     alignItems: 'center',
-    // flexDirection: 'row', con row se ve acomodado, la img a la iz y los txts a la derecha
-    flexDirection:'column',
+    flexDirection: 'row',
     marginBottom: 16,
     marginLeft: 10,
   },
   menuItemImage: {
-    backgroundColor:'green',
     width: 100,
     height: 100,
     resizeMode: 'cover',
     borderRadius: 10,
   },
   menuItemName: {
-    backgroundColor:'blue',
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 4,
   },
   menuItemPrice: {
-    backgroundColor:'yellow',
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 4,
   },
   menuItemDescription: {
-    backgroundColor:'grey',
     fontSize: 14,
   },
   searchBarInputContainer: {
@@ -162,8 +163,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#EDEFEE',
   },
   searchBarContainer: {
-    marginLeft: "0%",
-    marginRight: "10%",
     paddingHorizontal: 20,
     backgroundColor: '#495E57',
   },
@@ -171,6 +170,12 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     borderBottomColor: 'transparent',
     borderTopColor: 'transparent',
+  },
+  categoryContainer: {
+    justifyContent: 'space-evenly',
+    flexDirection: 'row',
+    marginTop: 10,
+    marginBottom: 10,
   },
 });
 
