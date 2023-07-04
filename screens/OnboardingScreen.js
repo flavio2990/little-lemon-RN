@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TextInput, Button, Image } from 'react-native';
+import { StyleSheet, Text, View, TextInput, ImageBackground, Image, Pressable } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 
 const logo = require('../img/Logo.png');
+const backgroundImage = require('../img/lemon.png');
 export default function OnboardingScreen() {
 
     const [firstName, setFirstName] = useState('');
@@ -46,37 +47,46 @@ export default function OnboardingScreen() {
         return emailRegex.test(email);
     };
 
-   
+
 
     const isNextButtonDisabled = firstName.trim() === '' || !validateEmail(email);
     return (
         <View style={styles.container}>
+                <ImageBackground source={backgroundImage} style={styles.backgroundImage} blurRadius={10}>
             <View style={styles.headerContainer}>
-                <Text style={styles.headerText}>Little Lemon</Text>
-                <View>
+                <View style={styles.logoContainer}>
                     <Image source={logo} style={styles.logo} />
                 </View>
             </View>
             <View style={styles.contentContainer}>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Enter your name"
-                    value={firstName}
-                    onChangeText={handleFirstNameChange}
-                />
-                <TextInput
-                    style={styles.input}
-                    placeholder="Enter your email"
-                    value={email}
-                    onChangeText={handleEmailChange}
-                />
-                <Button
-                    title="Next"
-                    onPress={handleOnboardingComplete}
-                    disabled={isNextButtonDisabled}
-                />
+                    <Text style={styles.welcomeText}>Welcome</Text>
+                    <Text style={styles.completeFields}>Complete the fields, please</Text>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Enter your name"
+                        value={firstName}
+                        onChangeText={handleFirstNameChange}
+                    />
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Enter your email"
+                        value={email}
+                        onChangeText={handleEmailChange}
+                    />
+                    <View style={styles.buttonContainer}>
+                        <Pressable
+                            style={({ pressed }) => [
+                                styles.button,
+                                { backgroundColor: pressed ? '#EE9972' : '#F4CE14', opacity: isNextButtonDisabled ? 0.5 : 1 },
+                            ]}
+                            onPress={handleOnboardingComplete}
+                            disabled={isNextButtonDisabled}
+                        >
+                            <Text style={styles.buttonText}>Next</Text>
+                        </Pressable>
+                    </View>
             </View>
-
+            </ImageBackground>
         </View>
     );
 }
@@ -92,6 +102,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginTop: 50,
     },
+    logoContainer: {
+        flex: 1,
+        alignItems: 'center',
+    },
     headerText: {
         fontSize: 24,
         fontWeight: 'bold',
@@ -101,8 +115,21 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         flex: 1,
     },
+    welcomeText: {
+        fontSize: 36,
+        fontWeight: 'bold',
+        marginBottom: 20,
+    },
     logo: {
         resizeMode: 'contain',
+        borderColor:'#495E57',
+        borderRadius:8,
+        backgroundColor:'white',
+    },
+    completeFields: {
+        fontWeight: 'bold',
+        color: '#495E57',
+        marginBottom: 10,
     },
     input: {
         height: 40,
@@ -111,5 +138,28 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         marginBottom: 10,
         paddingHorizontal: 10,
+        borderRadius:8,
+        backgroundColor:'white'
+    },
+
+    buttonContainer: {
+        marginBottom: 10,
+        marginTop: 10,
+    },
+    button: {
+        borderWidth: 1,
+        borderRadius: 10,
+        padding: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: 200,
+    },
+    buttonText: {
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    backgroundImage: {
+        flex: 1,
+        resizeMode:'contain',
     },
 });
