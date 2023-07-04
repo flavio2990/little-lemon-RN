@@ -6,7 +6,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const SplashScreen = ({ navigation }) => {
   const getIsCompleted = async () => {
     isOnboarding = await AsyncStorage.getItem('onboardingStatus');
-    isOnboarding === 'completed' ? navigation.navigate('Home') : navigation.navigate('Onboarding')
+    firstName = await AsyncStorage.getItem('@firstName')
+    profileImage = await AsyncStorage.getItem('@profileImage')
+    isOnboarding === 'completed' ? navigation.navigate('Home', { profileImage: profileImage, firstName: firstName, }) : navigation.navigate('Onboarding')
 }
 useEffect(() => {
   setTimeout(()=>{

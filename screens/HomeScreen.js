@@ -12,10 +12,11 @@ import _ from 'lodash';
 const logo = require('../img/Logo.png');
 const windowWidth = Dimensions.get('window').width;
 
-export default function HomeScreen() {
+export default function HomeScreen( ) {
   const navigation = useNavigation();
   const route = useRoute();
   const profileImage = route.params?.profileImage;
+  const firstName = route.params?.firstName;
   const [menuData, setMenuData] = useState([]);
 
   const fetchMenuData = async () => {
@@ -42,12 +43,22 @@ export default function HomeScreen() {
     navigation.navigate('Profile');
   };
 
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Image source={logo} style={styles.logo} />
         <TouchableOpacity style={styles.avatarContainer} onPress={navigateToProfile}>
-          <Avatar avatarStyle={styles.avatar} size="medium" rounded source={profileImage ? { uri: profileImage } : null} />
+          <Avatar
+            avatarStyle={styles.avatar}
+            size="medium"
+            rounded
+            source={profileImage ? { uri: profileImage } : null}
+          >
+            {!profileImage && (
+              <Text style={styles.avatarLetters}>{firstName.charAt(0)}{firstName.charAt(1)}</Text>
+            )}
+          </Avatar>
         </TouchableOpacity>
       </View>
       <View style={styles.contentContainer}>
@@ -88,6 +99,13 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     overflow: 'hidden',
     marginRight: 16,
+  },
+  avatarLetters: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: 'white',
+    textAlign: 'center',
+    marginBottom:'25%',
   },
   avatar: {
     resizeMode: 'contain',
